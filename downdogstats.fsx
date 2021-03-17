@@ -43,14 +43,36 @@ File.WriteAllText(fileName, body)
 type DownDogHistory = JsonProvider<fileName, SampleIsList=true, ResolutionFolder=__SOURCE_DIRECTORY__>
 
 let doc = DownDogHistory.GetSamples()
+let yogaLessons = doc.[0].Items
+let yogaLesson = yogaLessons.[0]
+for item in yogaLessons do
+    printfn $"SequenceId: {item.SequenceId}"
+    printfn
+        $"Timestamp: {
+                          Instant
+                              .FromUnixTimeSeconds(int64 (floor item.Timestamp.Seconds))
+                              .ToDateTimeUtc()
+        }"
 
-for item in doc do
-    for innerItem in item.Items do
-        printfn $"SequenceId: {innerItem.SequenceId}"
+type LessonId = string
+type LessonCategory = string
+type LessonLevel = string
+type LessonDuration = int
+type LessonFocus = string
+type LessonDate = Instant 
+type DownDowgLesson =
+    { lessonId: LessonId
+      category: LessonCategory
+      level: LessonLevel
+      duration: LessonDuration
+      focus: LessonFocus
+      date: LessonDate }
 
-        printfn
-            $"Timestamp: {
-                              Instant
-                                  .FromUnixTimeSeconds(int64 (floor innerItem.Timestamp.Seconds))
-                                  .ToDateTimeUtc()
-            }"
+type MapLessonCategory = DownDogHistory.Selector -> LessonCategory
+type MapLessonLevel = DownDogHistory.Selector -> LessonLevel
+type MapLessonFocus = DownDogHistory.Selector -> LessonFocus
+type MapLessonDuration = DownDogHistory.TotalTime -> LessonDuration
+type MapLessonDate = DownDogHistory.Timestamp -> LessonDate
+type MapDownDogLesson = DownDogHistory.Item -> DownDowgLesson
+
+
