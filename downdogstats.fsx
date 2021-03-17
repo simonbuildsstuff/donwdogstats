@@ -42,37 +42,61 @@ File.WriteAllText(fileName, body)
 *)
 type DownDogHistory = JsonProvider<fileName, SampleIsList=true, ResolutionFolder=__SOURCE_DIRECTORY__>
 
-let doc = DownDogHistory.GetSamples()
-let yogaLessons = doc.[0].Items
-let yogaLesson = yogaLessons.[0]
-for item in yogaLessons do
-    printfn $"SequenceId: {item.SequenceId}"
-    printfn
-        $"Timestamp: {
-                          Instant
-                              .FromUnixTimeSeconds(int64 (floor item.Timestamp.Seconds))
-                              .ToDateTimeUtc()
-        }"
+let downDogHistory = DownDogHistory.GetSamples()
+let historyItems = downDogHistory.[0].Items
 
+
+(*
+    Obtain Yoga Lessons from History
+*)
 type LessonId = string
 type LessonCategory = string
 type LessonLevel = string
 type LessonDuration = int
 type LessonFocus = string
-type LessonDate = Instant 
+type LessonDate = Instant
+
 type DownDowgLesson =
     { lessonId: LessonId
       category: LessonCategory
       level: LessonLevel
-      duration: LessonDuration
       focus: LessonFocus
+      duration: LessonDuration
       date: LessonDate }
 
-type MapLessonCategory = DownDogHistory.Selector -> LessonCategory
-type MapLessonLevel = DownDogHistory.Selector -> LessonLevel
-type MapLessonFocus = DownDogHistory.Selector -> LessonFocus
-type MapLessonDuration = DownDogHistory.TotalTime -> LessonDuration
-type MapLessonDate = DownDogHistory.Timestamp -> LessonDate
-type MapDownDogLesson = DownDogHistory.Item -> DownDowgLesson
+type ObtainLessonDuration = DownDogHistory.TotalTime -> LessonDuration
+type ObtainLessonDate = DownDogHistory.Timestamp -> LessonDate
+type ObtainSelectorValue = array<DownDogHistory.Selector> -> string -> string
+type ObtainDownDogLesson = DownDogHistory.Item -> DownDowgLesson
 
+let obtainSelectorValue : ObtainSelectorValue =
+    fun selectors selectorType ->
+        selectors
+        |> Array.find (fun elem -> elem.Type = selectorType)
+        |> (fun selector -> selector.Type)
 
+let obtainLessonDate : ObtainLessonDate =
+    fun timeStamp -> Instant.FromUnixTimeSeconds(int64 (floor timeStamp.Seconds))
+
+let obtainLessonDuration : ObtainLessonDuration =
+    fun totalTime -> int32 (floor totalTime.Seconds)
+
+let obtainDownDogLesson : ObtainDownDogLesson =
+    fun item ->
+        { lessonId = item.SequenceId
+          category =  obtainSelectorValue item.Selectors "CATEGORY"
+          level = obtainSelectorValue item.Selectors "LEVEL"
+          focus = "" //obtainSelectorValue item.Selectors "FOCUS_AREA"
+          duration = obtainLessonDuration item.TotalTime
+          date = obtainLessonDate item.Timestamp }
+
+let yogaLessons =
+    historyItems
+    |> Array.filter (fun elem -> elem.AppType = "ORIGINAL")
+    |> Array.map (obtainDownDogLesson)
+    |> Array.toList
+
+for lesson in yogaLessons do
+    printfn $"lessonId: {lesson.lessonId}"
+
+    printfn $"Timestamp: {lesson.date.ToDateTimeUtc}"
