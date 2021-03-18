@@ -2,12 +2,16 @@
 #r "nuget: Http.fs, 5.4.0"
 #r "nuget: FSharp.Data"
 #r "nuget: NodaTime"
+#r "nuget: XPlot.Plotly, 4.0.0"
+#r "nuget: XPlot.GoogleCharts, 3.0.1"
+#r "nuget: XPlot.GoogleCharts.Deedle, 3.0.1"
 
 open Hopac
 open HttpFs.Client
 open FSharp.Data
 open System.IO
 open NodaTime
+open XPlot.Plotly
 
 (*
     SecretHub: Get Cookie Credentials for DownDog
@@ -52,7 +56,7 @@ let historyItems = downDogHistory.[0].Items
 type LessonId = string
 type LessonCategory = string
 type LessonLevel = string
-type LessonDuration = int
+type LessonDuration = int64
 type LessonFocus = string
 type LessonDate = Instant
 
@@ -86,7 +90,7 @@ let obtainSelectorValueOption : ObtainSelectorValueOption =
 let obtainLessonDate (timeStamp: DownDogHistory.Timestamp) =
     Instant.FromUnixTimeSeconds(int64 (floor timeStamp.Seconds))
 
-let obtainLessonDuration (totalTime: DownDogHistory.TotalTime) = int32 (floor totalTime.Seconds)
+let obtainLessonDuration (totalTime: DownDogHistory.TotalTime) = int64 (floor totalTime.Seconds)
 
 let obtainDownDogLesson : ObtainDownDogLesson =
     fun item ->
@@ -107,3 +111,24 @@ for lesson in yogaLessons do
     printfn $"lessonId: {lesson.lessonId}"
 
     printfn $"Timestamp: {lesson.date.ToDateTimeUtc}"
+
+(*
+    Plot graphs
+*)
+
+
+let x = yogaLessons |> List.map (fun elem -> elem.date )
+let y = yogaLessons |> List.map (fun elem -> Duration.FromSeconds(elem.duration).Minutes)
+
+let layout = Layout(title = "Yoga lessons taken during covid")
+
+let chart1 =
+    Bar(
+        x = x,
+        y = y
+    )
+    |> Chart.Plot
+    |> Chart.WithLayout layout
+    |> Chart.WithWidth 700
+    |> Chart.WithHeight 500
+    |> Chart.Show
