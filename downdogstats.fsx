@@ -60,13 +60,12 @@ type DownDowgLesson =
     { lessonId: LessonId
       category: LessonCategory
       level: LessonLevel
-      focus: LessonFocus
+      focus: Option<LessonFocus>
       duration: LessonDuration
       date: LessonDate }
 
-type ObtainLessonDuration = DownDogHistory.TotalTime -> LessonDuration
-type ObtainLessonDate = DownDogHistory.Timestamp -> LessonDate
 type ObtainSelectorValue = array<DownDogHistory.Selector> -> string -> string
+type ObtainSelectorValueOption = array<DownDogHistory.Selector> -> string -> Option<string>
 type ObtainDownDogLesson = DownDogHistory.Item -> DownDowgLesson
 
 let obtainSelectorValue : ObtainSelectorValue =
@@ -75,18 +74,26 @@ let obtainSelectorValue : ObtainSelectorValue =
         |> Array.find (fun elem -> elem.Type = selectorType)
         |> (fun selector -> selector.Type)
 
-let obtainLessonDate : ObtainLessonDate =
-    fun timeStamp -> Instant.FromUnixTimeSeconds(int64 (floor timeStamp.Seconds))
+let obtainSelectorValueOption : ObtainSelectorValueOption =
+    fun selectors selectorType ->
+        selectors
+        |> Array.tryFind (fun elem -> elem.Type = selectorType)
+        |> (fun selectorOption ->
+            match selectorOption with
+            | None -> None
+            | Some selector -> Some selector.Type)
 
-let obtainLessonDuration : ObtainLessonDuration =
-    fun totalTime -> int32 (floor totalTime.Seconds)
+let obtainLessonDate (timeStamp: DownDogHistory.Timestamp) =
+    Instant.FromUnixTimeSeconds(int64 (floor timeStamp.Seconds))
+
+let obtainLessonDuration (totalTime: DownDogHistory.TotalTime) = int32 (floor totalTime.Seconds)
 
 let obtainDownDogLesson : ObtainDownDogLesson =
     fun item ->
         { lessonId = item.SequenceId
-          category =  obtainSelectorValue item.Selectors "CATEGORY"
+          category = obtainSelectorValue item.Selectors "CATEGORY"
           level = obtainSelectorValue item.Selectors "LEVEL"
-          focus = "" //obtainSelectorValue item.Selectors "FOCUS_AREA"
+          focus = obtainSelectorValueOption item.Selectors "FOCUS_AREA"
           duration = obtainLessonDuration item.TotalTime
           date = obtainLessonDate item.Timestamp }
 
