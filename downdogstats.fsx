@@ -107,11 +107,6 @@ let yogaLessons =
     |> Array.map (obtainDownDogLesson)
     |> Array.toList
 
-for lesson in yogaLessons do
-    printfn $"lessonId: {lesson.lessonId}"
-
-    printfn $"Timestamp: {lesson.date.ToDateTimeUtc}"
-
 (*
     Plot graphs
 *)
