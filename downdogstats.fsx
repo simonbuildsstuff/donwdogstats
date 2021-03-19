@@ -35,7 +35,6 @@ let body =
     |> Request.responseAsString
     |> run
 
-
 [<Literal>]
 let fileName = "downdoghistory.json"
 
@@ -48,7 +47,6 @@ type DownDogHistory = JsonProvider<fileName, SampleIsList=true, ResolutionFolder
 
 let downDogHistory = DownDogHistory.GetSamples()
 let historyItems = downDogHistory.[0].Items
-
 
 (*
     Obtain Yoga Lessons from History
@@ -68,38 +66,31 @@ type DownDowgLesson =
       duration: LessonDuration
       date: LessonDate }
 
-type ObtainSelectorValue = array<DownDogHistory.Selector> -> string -> string
-type ObtainSelectorValueOption = array<DownDogHistory.Selector> -> string -> Option<string>
-type ObtainDownDogLesson = DownDogHistory.Item -> DownDowgLesson
+let obtainSelectorValue (selectors: array<DownDogHistory.Selector>) (selectorType: string) : string =
+    selectors
+    |> Array.find (fun elem -> elem.Type = selectorType)
+    |> (fun selector -> selector.Type)
 
-let obtainSelectorValue : ObtainSelectorValue =
-    fun selectors selectorType ->
-        selectors
-        |> Array.find (fun elem -> elem.Type = selectorType)
-        |> (fun selector -> selector.Type)
-
-let obtainSelectorValueOption : ObtainSelectorValueOption =
-    fun selectors selectorType ->
-        selectors
-        |> Array.tryFind (fun elem -> elem.Type = selectorType)
-        |> (fun selectorOption ->
-            match selectorOption with
-            | None -> None
-            | Some selector -> Some selector.Type)
+let obtainSelectorValueOption (selectors: array<DownDogHistory.Selector>) (selectorType: string) : Option<string> =
+    selectors
+    |> Array.tryFind (fun elem -> elem.Type = selectorType)
+    |> (fun selectorOption ->
+        match selectorOption with
+        | None -> None
+        | Some selector -> Some selector.Type)
 
 let obtainLessonDate (timeStamp: DownDogHistory.Timestamp) =
     Instant.FromUnixTimeSeconds(int64 (floor timeStamp.Seconds))
 
 let obtainLessonDuration (totalTime: DownDogHistory.TotalTime) = int64 (floor totalTime.Seconds)
 
-let obtainDownDogLesson : ObtainDownDogLesson =
-    fun item ->
-        { lessonId = item.SequenceId
-          category = obtainSelectorValue item.Selectors "CATEGORY"
-          level = obtainSelectorValue item.Selectors "LEVEL"
-          focus = obtainSelectorValueOption item.Selectors "FOCUS_AREA"
-          duration = obtainLessonDuration item.TotalTime
-          date = obtainLessonDate item.Timestamp }
+let obtainDownDogLesson (item: DownDogHistory.Item) : DownDowgLesson =
+    { lessonId = item.SequenceId
+      category = obtainSelectorValue item.Selectors "CATEGORY"
+      level = obtainSelectorValue item.Selectors "LEVEL"
+      focus = obtainSelectorValueOption item.Selectors "FOCUS_AREA"
+      duration = obtainLessonDuration item.TotalTime
+      date = obtainLessonDate item.Timestamp }
 
 let yogaLessons =
     historyItems
@@ -110,18 +101,18 @@ let yogaLessons =
 (*
     Plot graphs
 *)
+let x =
+    yogaLessons |> List.map (fun elem -> elem.date)
 
+let y =
+    yogaLessons
+    |> List.map (fun elem -> Duration.FromSeconds(elem.duration).Minutes)
 
-let x = yogaLessons |> List.map (fun elem -> elem.date )
-let y = yogaLessons |> List.map (fun elem -> Duration.FromSeconds(elem.duration).Minutes)
-
-let layout = Layout(title = "Yoga lessons taken during covid")
+let layout =
+    Layout(title = "Yoga lessons taken during covid")
 
 let chart1 =
-    Bar(
-        x = x,
-        y = y
-    )
+    Bar(x = x, y = y)
     |> Chart.Plot
     |> Chart.WithLayout layout
     |> Chart.WithWidth 700
