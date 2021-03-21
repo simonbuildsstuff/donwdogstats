@@ -28,7 +28,7 @@ let body =
     Request.createUrl Post "https://www.downdogapp.com/json/history"
     |> Request.setHeader (
         ContentType
-            (ContentType.parse "application/x-www-form-urlencoded")
+            (ContentType.parse HttpContentTypes.FormValues)
                 .Value
     )
     |> Request.setHeader (Custom("Cookie", secret))
@@ -52,9 +52,10 @@ let historyItems = downDogHistory.[0].Items
     Obtain Yoga Lessons from History
 *)
 type LessonId = string
+
 type LessonCategory = string
 type LessonLevel = string
-type LessonDuration = int64
+type LessonDuration = int
 type LessonFocus = string
 type LessonDate = Instant
 
@@ -69,7 +70,7 @@ type DownDowgLesson =
 let obtainSelectorValue (selectors: array<DownDogHistory.Selector>) (selectorType: string) : string =
     selectors
     |> Array.find (fun elem -> elem.Type = selectorType)
-    |> (fun selector -> selector.Type)
+    |> (fun selector -> selector.Label)
 
 let obtainSelectorValueOption (selectors: array<DownDogHistory.Selector>) (selectorType: string) : Option<string> =
     selectors
@@ -77,7 +78,7 @@ let obtainSelectorValueOption (selectors: array<DownDogHistory.Selector>) (selec
     |> (fun selectorOption ->
         match selectorOption with
         | None -> None
-        | Some selector -> Some selector.Type)
+        | Some selector -> Some selector.Label)
 
 let obtainLessonDate (timeStamp: DownDogHistory.Timestamp) =
     Instant.FromUnixTimeSeconds(int64 (floor timeStamp.Seconds))
@@ -89,7 +90,14 @@ let obtainDownDogLesson (item: DownDogHistory.Item) : DownDowgLesson =
       category = obtainSelectorValue item.Selectors "CATEGORY"
       level = obtainSelectorValue item.Selectors "LEVEL"
       focus = obtainSelectorValueOption item.Selectors "FOCUS_AREA"
-      duration = obtainLessonDuration item.TotalTime
+      duration =
+          obtainSelectorValue item.Selectors "LENGTH"
+          |> String.split ' '
+          |> List.first
+          |> (fun x ->
+              match x with
+              | None -> 0
+              | Some y -> int y)
       date = obtainLessonDate item.Timestamp }
 
 let yogaLessons =
@@ -106,10 +114,15 @@ let x =
 
 let y =
     yogaLessons
-    |> List.map (fun elem -> Duration.FromSeconds(elem.duration).Minutes)
+    |> List.map (fun elem -> elem.duration)
 
 let layout =
-    Layout(title = "Yoga lessons taken during covid")
+    Layout(
+        title = "Yoga lessons taken during covid",
+        xaxis = Xaxis(tickfont = Font(size = 14., color = "rgb(107, 107, 107)")),
+        yaxis = Yaxis(tickfont = Font(size = 14., color = "rgb(107, 107, 107)"))
+
+    )
 
 let chart1 =
     Bar(x = x, y = y)
