@@ -67,12 +67,12 @@ type DownDowgLesson =
       duration: LessonDuration
       date: LessonDate }
 
-let obtainSelectorValue (selectors: array<DownDogHistory.Selector>) (selectorType: string) : string =
+let obtainSelectorValue (selectorType: string) (selectors: array<DownDogHistory.Selector>) : string =
     selectors
     |> Array.find (fun elem -> elem.Type = selectorType)
     |> (fun selector -> selector.Label)
 
-let obtainSelectorValueOption (selectors: array<DownDogHistory.Selector>) (selectorType: string) : Option<string> =
+let obtainSelectorValueOption (selectorType: string) (selectors: array<DownDogHistory.Selector>) : Option<string> =
     selectors
     |> Array.tryFind (fun elem -> elem.Type = selectorType)
     |> (fun selectorOption ->
@@ -83,21 +83,24 @@ let obtainSelectorValueOption (selectors: array<DownDogHistory.Selector>) (selec
 let obtainLessonDate (timeStamp: DownDogHistory.Timestamp) =
     Instant.FromUnixTimeSeconds(int64 (floor timeStamp.Seconds))
 
-let obtainLessonDuration (totalTime: DownDogHistory.TotalTime) = int64 (floor totalTime.Seconds)
+let obtainLessonDuration (selectorLabel: string) =
+    String.split ' ' selectorLabel
+    |> List.first
+    |> (fun x ->
+        match x with
+        | None -> 0
+        | Some y -> int y)
+
+let obtainLessonDurationFromSelectors =
+    obtainSelectorValue "LENGTH"
+    >> obtainLessonDuration
 
 let obtainDownDogLesson (item: DownDogHistory.Item) : DownDowgLesson =
     { lessonId = item.SequenceId
-      category = obtainSelectorValue item.Selectors "CATEGORY"
-      level = obtainSelectorValue item.Selectors "LEVEL"
-      focus = obtainSelectorValueOption item.Selectors "FOCUS_AREA"
-      duration =
-          obtainSelectorValue item.Selectors "LENGTH"
-          |> String.split ' '
-          |> List.first
-          |> (fun x ->
-              match x with
-              | None -> 0
-              | Some y -> int y)
+      category = obtainSelectorValue "CATEGORY" item.Selectors
+      level = obtainSelectorValue "LEVEL" item.Selectors
+      focus = obtainSelectorValueOption "FOCUS_AREA" item.Selectors
+      duration = obtainLessonDurationFromSelectors item.Selectors
       date = obtainLessonDate item.Timestamp }
 
 let yogaLessons =
