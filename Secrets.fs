@@ -1,5 +1,7 @@
 module Secrets
 
-let secretHubClient = new SecretHub.Client()
+open SecretHub
+
+let secretHubClient = new Client()
 
 let resolveSecret secretPath = secretHubClient.Resolve(secretPath)

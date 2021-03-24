@@ -10,6 +10,7 @@
     <Compile Include="DownDogHistoryProvider.fs" />
     <Compile Include="MapDownDogHistoryToLessons.fs" />
     <Compile Include="PlotYogaStats.fs" />
+    <Compile Include="ArgumentParser.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
