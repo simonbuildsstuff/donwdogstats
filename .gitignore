@@ -3,3 +3,4 @@ obj
 .ionide
 downdoghistory.json
 .fake
+.paket

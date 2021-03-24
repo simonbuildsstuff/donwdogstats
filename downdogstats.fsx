@@ -1,10 +1,12 @@
 #r "nuget: SecretHub"
 #r "nuget: Http.fs, 5.4.0"
 #r "nuget: FSharp.Data"
-#r "nuget: NodaTime"
 #r "nuget: XPlot.Plotly, 4.0.0"
 #r "nuget: XPlot.GoogleCharts, 3.0.1"
 #r "nuget: XPlot.GoogleCharts.Deedle, 3.0.1"
+#r @"/home/ahab/.nuget/packages/nodatime/3.0.5/lib/netstandard2.0/NodaTime.dll"
+
+
 
 open Hopac
 open HttpFs.Client
@@ -17,9 +19,7 @@ open XPlot.Plotly
     SecretHub: Get Cookie Credentials for DownDog
 *)
 let secretHubClient = new SecretHub.Client()
-
-let secret =
-    secretHubClient.Resolve("secrethub://simonbuildsstuff/downdog/cookiecreds")
+let secret = secretHubClient.Resolve "secrethub://simonbuildsstuff/downdog/cookiecreds"
 
 (*
     Download DownDog History
@@ -106,7 +106,7 @@ let obtainDownDogLesson (item: DownDogHistory.Item) : DownDowgLesson =
 let yogaLessons =
     historyItems
     |> Array.filter (fun elem -> elem.AppType = "ORIGINAL")
-    |> Array.map (obtainDownDogLesson)
+    |> Array.map obtainDownDogLesson
     |> Array.toList
 
 (*
@@ -131,6 +131,6 @@ let chart1 =
     Bar(x = x, y = y)
     |> Chart.Plot
     |> Chart.WithLayout layout
-    |> Chart.WithWidth 700
-    |> Chart.WithHeight 500
+    |> Chart.WithWidth 1920
+    |> Chart.WithHeight 1080
     |> Chart.Show

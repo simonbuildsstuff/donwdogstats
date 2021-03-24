@@ -1,0 +1,9 @@
+FSharp.Core
+NodaTime
+SecretHub
+Http.fs
+FSharp.Data
+XPlot.Plotly
+XPlot.GoogleCharts
+XPlot.GoogleCharts.Deedle
+Microsoft.Extensions.Configuration.Json
