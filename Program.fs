@@ -4,20 +4,38 @@ open DownDog.FileDownloader
 open MapDownDogHistoryToLesson
 open PlotYogaStats
 open Microsoft.Extensions.Configuration
-open ArgumentParser
-
-// Define a function to construct a message to print
-let from whom =
-    sprintf "from %s" whom
-
-let configuration = ConfigurationBuilder().AddJsonFile("appsettings.json").Build()
+open CommandLineArguments
+open Argu
+open System
 
 [<EntryPoint>]
 let main argv =
-    let plot = parseArguments argv
+
+    let configuration =
+        ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+            .Build()
+
+    let errorHandler =
+        ProcessExiter(
+            colorizer =
+                function
+                | ErrorCode.HelpText -> None
+                | _ -> Some ConsoleColor.Red
+        )
+
+    let parser =
+        ArgumentParser.Create<PlotArguments>(programName = "donwDogPlot", errorHandler = errorHandler)
+
+    let results = parser.ParseCommandLine argv
+
+    let plot = results.GetResult(Plot)
+
     downloadFileToDisk
+
     match plot with
-       | PlotEnum.History ->  plotLessonHistory yogaLessons
-       | PlotEnum.Music -> () 
-       | _ -> ()
+    | PlotEnum.History -> plotLessonHistory yogaLessons
+    | PlotEnum.Music -> ()
+    | _ -> ()
+
     0 // return an integer exit code
