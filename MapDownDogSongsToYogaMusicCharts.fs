@@ -13,6 +13,7 @@ let obtainTitle (downDogTitle: DownDogHistory.IntOrBooleanOrString) =
             | Some n -> string n
         | Some b -> string b
     | Some t -> t
+    |> String.replace "\"" "'"
 
 let obtainSpotifyUri (downDogSpotifyUri: string option) =
     match downDogSpotifyUri with
@@ -25,16 +26,16 @@ let obtainSong (downDogSong: DownDogHistory.Song) : Song =
       title = obtainTitle downDogSong.Title
       spotifyUrl = obtainSpotifyUri downDogSong.SpotifyUrl }
 
+let countByElements collection : seq<_> =
+    collection
+    |> Seq.countBy (fun x -> if (x = x) then x else x)
 
 let obtainYogaMusicCharts (historyItems: array<DownDogHistory.Item>) =
     historyItems
     |> Array.collect (fun element -> element.Songs)
     |> Array.map obtainSong
-    |> Array.countBy (fun elem ->  if (elem = elem) then elem else elem  )
+    |> countByElements
+    |> Seq.sortByDescending (fun (a,b) -> b)
+    |> Seq.toList
 
 let yogaMusicCharts = obtainYogaMusicCharts historyItems
-
-
-let printyogaMusicCharts =
-    for item in yogaMusicCharts do
-        printfn "%A" item

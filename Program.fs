@@ -36,7 +36,7 @@ let main argv =
 
     match plot with
     | PlotEnum.History -> plotLessonHistory yogaLessons
-    | PlotEnum.Music -> printyogaMusicCharts
+    | PlotEnum.Music -> plotYogaMusicCharts yogaMusicCharts
     | _ -> ()
 
     0 // return an integer exit code
