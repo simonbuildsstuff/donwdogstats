@@ -1,6 +1,5 @@
 module PlotYogaStats
 
-open DomainTypes
 open XPlot.Plotly
 
 let plotLessonHistory (yogaLessons: List<Lesson>) : unit =

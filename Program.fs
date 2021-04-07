@@ -2,6 +2,7 @@
 
 open DownDog.FileDownloader
 open MapDownDogHistoryToLesson
+open MapDownDogSongsToYogaMusicCharts
 open PlotYogaStats
 open Microsoft.Extensions.Configuration
 open CommandLineArguments
@@ -35,7 +36,7 @@ let main argv =
 
     match plot with
     | PlotEnum.History -> plotLessonHistory yogaLessons
-    | PlotEnum.Music -> ()
+    | PlotEnum.Music -> printyogaMusicCharts
     | _ -> ()
 
     0 // return an integer exit code

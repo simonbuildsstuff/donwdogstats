@@ -1,6 +1,5 @@
 module MapDownDogHistoryToLesson
 
-open DomainTypes
 open NodaTime
 open DownDog.JsonTypeProvider
 
@@ -32,7 +31,7 @@ let obtainLessonDurationFromSelectors =
     obtainSelectorValue "LENGTH"
     >> obtainLessonDuration
 
-let obtainDownDogLesson (item: DownDogHistory.Item) : Lesson =
+let obtainLesson (item: DownDogHistory.Item) : Lesson =
     { lessonId = item.SequenceId
       category = obtainSelectorValue "CATEGORY" item.Selectors
       level = obtainSelectorValue "LEVEL" item.Selectors
@@ -43,5 +42,5 @@ let obtainDownDogLesson (item: DownDogHistory.Item) : Lesson =
 let yogaLessons =
     historyItems
     |> Array.filter (fun elem -> elem.AppType = "ORIGINAL")
-    |> Array.map obtainDownDogLesson
+    |> Array.map obtainLesson
     |> Array.toList

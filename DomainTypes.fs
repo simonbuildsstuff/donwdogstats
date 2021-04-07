@@ -1,6 +1,8 @@
+[<AutoOpen>]
 module DomainTypes
 
 open NodaTime
+open System
 
 type LessonId = string
 type LessonCategory = string
@@ -16,3 +18,16 @@ type Lesson =
       focus: Option<LessonFocus>
       duration: LessonDuration
       date: LessonDate }
+
+
+
+type SongId = string
+type Artist = string
+type Title = string
+type SpotifyUrl = Uri option
+
+type Song =
+    { id: SongId
+      artist: Artist
+      title: Title
+      spotifyUrl: SpotifyUrl }

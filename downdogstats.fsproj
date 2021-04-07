@@ -8,6 +8,7 @@
     <Compile Include="DomainTypes.fs" />
     <Compile Include="Secrets.fs" />
     <Compile Include="DownDogHistoryProvider.fs" />
+    <Compile Include="MapDownDogSongsToYogaMusicCharts.fs" />
     <Compile Include="MapDownDogHistoryToLessons.fs" />
     <Compile Include="PlotYogaStats.fs" />
     <Compile Include="CommandLineArguments.fs" />
