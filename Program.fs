@@ -26,7 +26,7 @@ let main argv =
         )
 
     let parser =
-        ArgumentParser.Create<PlotArguments>(programName = "donwDogPlot", errorHandler = errorHandler)
+        ArgumentParser.Create<PlotArguments>(programName = "downDogPlot", errorHandler = errorHandler)
 
     let results = parser.ParseCommandLine argv
 

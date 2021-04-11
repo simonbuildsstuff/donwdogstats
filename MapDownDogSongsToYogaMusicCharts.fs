@@ -26,15 +26,15 @@ let obtainSong (downDogSong: DownDogHistory.Song) : Song =
       title = obtainTitle downDogSong.Title
       spotifyUrl = obtainSpotifyUri downDogSong.SpotifyUrl }
 
-let countByElements collection : seq<_> =
+let countById collection : seq<_> =
     collection
-    |> Seq.countBy (fun x -> if (x = x) then x else x)
+    |> Seq.countBy id
 
 let obtainYogaMusicCharts (historyItems: array<DownDogHistory.Item>) =
     historyItems
     |> Array.collect (fun element -> element.Songs)
     |> Array.map obtainSong
-    |> countByElements
+    |> countById
     |> Seq.sortByDescending (fun (a,b) -> b)
     |> Seq.toList
 
