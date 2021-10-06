@@ -1,7 +1,37 @@
-module Secrets
+namespace Secrets
 
-open SecretHub
+module SecretHubSecrets =
+    
+    open SecretHub
 
-let secretHubClient = new Client()
+    let resolveSecret = 
+        let secretHubClient = new Client()
+        secretHubClient.Resolve("secrethub://simonbuildsstuff/downdog/cookiecreds")
 
-let resolveSecret secretPath = secretHubClient.Resolve(secretPath)
+module AWSSecrets =
+    
+    open Amazon
+    open Amazon.SecretsManager
+    open Amazon.SecretsManager.Model
+    open Amazon.Runtime.CredentialManagement
+    open Amazon.Runtime.Credentials
+    open System.Threading
+    open System
+
+    let resolveSecret =  
+        
+        let awsSecretManagerClient = new AmazonSecretsManagerClient(RegionEndpoint.EUCentral1)
+        
+        let secretName = "/downdog/cred";
+        let mutable secretValueRequest = GetSecretValueRequest()
+        secretValueRequest.SecretId <- secretName
+
+        let asyncSecrets = async {
+            let! result = awsSecretManagerClient.GetSecretValueAsync(secretValueRequest, CancellationToken(false))
+                        |> Async.AwaitTask  
+            return result
+        } 
+
+        let secretResolved = Async.RunSynchronously(asyncSecrets)
+        secretResolved.SecretString
+        

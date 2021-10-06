@@ -8,3 +8,5 @@ XPlot.GoogleCharts
 XPlot.GoogleCharts.Deedle
 Microsoft.Extensions.Configuration.Json
 Argu
+AWSSDK.Core
+AWSSDK.SecretsManager

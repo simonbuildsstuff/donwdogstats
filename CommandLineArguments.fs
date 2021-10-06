@@ -1,7 +1,6 @@
 module CommandLineArguments
 
 open Argu
-open System
 
 type PlotEnum =
     | History = 0
