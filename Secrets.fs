@@ -13,10 +13,7 @@ module AWSSecrets =
     open Amazon
     open Amazon.SecretsManager
     open Amazon.SecretsManager.Model
-    open Amazon.Runtime.CredentialManagement
-    open Amazon.Runtime.Credentials
     open System.Threading
-    open System
 
     let resolveSecret =  
         
