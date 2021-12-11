@@ -1,17 +1,17 @@
 source https://api.nuget.org/v3/index.json
 
 storage: none
-framework: netcoreapp5.0, netstandard2.0, netstandard2.1
+framework: net6.0, netstandard2.0, netstandard2.1
 
-nuget FSharp.Core
-nuget SecretHub
+nuget FSharp.Core 6.0.1
+nuget SecretHub 0.2.1 
 nuget Http.fs 5.4.0
-nuget FSharp.Data
-nuget NodaTime
-nuget XPlot.Plotly 4.0.0
+nuget FSharp.Data 4.2.6
+nuget NodaTime 3.0.9
+nuget XPlot.Plotly 4.0.6
 nuget XPlot.GoogleCharts 3.0.1
 nuget XPlot.GoogleCharts.Deedle 3.0.1
-nuget Microsoft.Extensions.Configuration.Json
+nuget Microsoft.Extensions.Configuration.Json 6.0.0
 nuget Argu 6.1.1
-nuget AWSSDK.Core
-nuget AWSSDK.SecretsManager
+nuget AWSSDK.Core 3.7.5.5
+nuget AWSSDK.SecretsManager 3.7.1.59

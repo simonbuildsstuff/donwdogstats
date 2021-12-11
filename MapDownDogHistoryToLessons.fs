@@ -7,12 +7,12 @@ let yogaLessons =
 
     let obtainSelectorValue (selectorType: string) (selectors: array<DownDogHistory.Selector>) : string =
         selectors
-        |> Array.find (fun elem -> elem.Type = selectorType)
+        |> Array.find (fun elem -> elem.Type.IsSome && elem.Type.Value = selectorType)
         |> (fun selector -> selector.Label)
 
     let obtainSelectorValueOption (selectorType: string) (selectors: array<DownDogHistory.Selector>) : Option<string> =
         selectors
-        |> Array.tryFind (fun elem -> elem.Type = selectorType)
+        |> Array.tryFind (fun elem -> elem.Type.IsSome && elem.Type.Value = selectorType)
         |> (fun selectorOption ->
             match selectorOption with
             | None -> None
@@ -42,6 +42,6 @@ let yogaLessons =
           date = obtainLessonDate item.Timestamp }
 
     historyItems
-    |> Array.filter (fun elem -> elem.AppType = "ORIGINAL")
+    |> Array.filter (fun elem -> elem.AppType.IsSome && elem.AppType.Value = "ORIGINAL")
     |> Array.map obtainLesson
     |> Array.toList
