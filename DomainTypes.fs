@@ -14,7 +14,7 @@ type LessonDate = Instant
 type Lesson =
     { lessonId: LessonId
       category: LessonCategory
-      level: LessonLevel
+      level: Option<LessonLevel>
       focus: Option<LessonFocus>
       duration: LessonDuration
       date: LessonDate }

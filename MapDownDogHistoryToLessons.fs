@@ -35,13 +35,12 @@ let yogaLessons =
 
     let obtainLesson (item: DownDogHistory.Item) : Lesson =
         { lessonId = item.SequenceId
-          category = obtainSelectorValue "CATEGORY" item.Selectors
-          level = obtainSelectorValue "LEVEL" item.Selectors
+          category = "YOGA"
+          level = obtainSelectorValueOption "LEVEL" item.Selectors
           focus = obtainSelectorValueOption "FOCUS_AREA" item.Selectors
           duration = obtainLessonDurationFromSelectors item.Selectors
           date = obtainLessonDate item.Timestamp }
 
     historyItems
-    |> Array.filter (fun elem -> elem.AppType.IsSome && elem.AppType.Value = "ORIGINAL")
     |> Array.map obtainLesson
     |> Array.toList
